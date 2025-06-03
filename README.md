@@ -16,7 +16,12 @@ The code in this repository is composed of two parts:
 - The software to set up an MQTT broker and a web server to look at the live
   data, passed from the server to the page using socketio.
 
-[TODO GIF OF THE WORKING WEBPAGE]
+![webdemo](/docs/webdemo.gif)
+
+On the hardware side, we also use the ESP32's built-in display to show some
+basic status information:
+
+[TODO PHOTO OF THE DEVICE SCREEN]
 
 ## Assignment questions
 

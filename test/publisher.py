@@ -6,10 +6,12 @@ import time, random
 client = mqtt.Client()
 client.connect("localhost", 1883, 60)
 
-for i in range(50):
-    message = '{"temperature":' + str(random.randint(250, 350)/10) + ',"humidity":' + str(random.randint(0,100)) + '}'
-    client.publish("esp32/sensors/dht11", message)
-    print(f"Sent: {message}")
-    time.sleep(1)
-
-client.disconnect()
+try:
+    while True:
+        message = '{"temperature":' + str(random.randint(250, 350)/10) + ',"humidity":' + str(random.randint(0,100)) + '}'
+        client.publish("esp32/sensors/dht11", message)
+        print(f"Sent: {message}")
+        time.sleep(.5)
+except KeyboardInterrupt:
+    print("Bye!")
+    client.disconnect()
