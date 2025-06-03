@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  app:
+    build: ./flask
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mqtt
+    environment:
+      - FLASK_ENV=development # For the sake of demonstration
+      - MQTT_HOST=mqtt
+
+  mqtt:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf

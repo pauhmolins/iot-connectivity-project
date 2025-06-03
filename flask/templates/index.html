@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Real-Time MQTT Plot</title>
+  <!-- To ensure the repo is lightweight we import them from elsewhere -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <h1>Real-Time MQTT Data</h1>
+  <hr/>
+  <h2>Temperature</h2>
+  <canvas id="TemperatureChart" width="600" height="100"></canvas>
+  <h2>Humidity</h2>
+  <canvas id="HumidityChart" width="600" height="100"></canvas>
+
+  <script>
+    function create_chart(variable) {
+      const ctx = document.getElementById(`${variable}Chart`).getContext('2d');
+      const labels = [];
+      const data = {
+        labels: labels,
+        datasets: [{
+          label: `MQTT ${variable}`,
+          backgroundColor: 'rgba(0, 123, 255, 0.5)',
+          borderColor: 'rgb(0, 123, 255)',
+          data: [],
+          fill: false,
+          tension: 0.1,
+        }]
+      };
+
+      const config = {
+        type: 'line',
+        data: data,
+        options: {
+          scales: {
+            x: { title: { display: true, text: 'Time' }},
+            y: { title: { display: true, text: variable }}
+          }
+        }
+      };
+
+      return {
+        variable: variable,
+        variable_lower: variable.toLowerCase(),
+        ctx: ctx,
+        labels: labels,
+        data: data,
+        config: config,
+        chart: new Chart(ctx, config),
+      };
+    }
+
+    const charts = [
+      create_chart('Temperature'),
+      create_chart('Humidity'),
+    ];
+    const socket = io();
+
+    socket.on('mqtt_data', (msg) => {
+      const now = new Date().toLocaleTimeString();
+      for (let i=0; i<charts.length; i++) {
+        const chart = charts[i];
+        chart.labels.push(now);
+        chart.data.datasets[0].data.push(msg[chart.variable_lower]);
+
+        if (chart.labels.length > 50) {
+          chart.labels.shift();
+          chart.data.datasets[0].data.shift();
+        }
+
+        chart.chart.update();
+      }
+    });
+  </script>
+</body>
+</html>
