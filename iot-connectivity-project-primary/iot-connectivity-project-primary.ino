@@ -6,7 +6,7 @@
 #include "SSD1306.h"        
 #include <time.h>
 
-// WiFi credentials
+// WiFi credentials (a mobile hotspot works well for testing)
 const char* ssid = "Redmi Note 7";
 const char* password = "Zt14C3gh";
 

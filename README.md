@@ -65,13 +65,17 @@ Our setup for the weather station (built around an ESP32-based board with sensor
 
 The setup steps are as follows:
 1. Install the Arduino IDE.
-1. Connect the Heltec Wifi Lora 32 v2 board to your computer via USB.
-2. Open the Arduino IDE and select the correct board and port.
-3. Open the sketch at [`iot-connectivity-project-primary.ino`](iot-connectivity-project-primary/iot-connectivity-project-primary.ino).
-4. Adjust the WiFi credentials and MQTT broker settings in the code as described below.
-5. Ensure the WiFi access point is available and the MQTT broker is running (see the previous section for details on setting up the broker and web dashboard).
-6. Install the necessary libraries (if not already installed).
-7. Upload the code to the ESP32 board.
+2. Connect the DHT11 sensor to the Heltec Wifi Lora 32 v2 board:
+   - ``VCC`` pin to the board's ``3.3V`` pin
+   - ``GND`` pin to the board's ``GND`` pin
+   - ``DATA`` pin to ``GPIO27`` on the board (or any other GPIO, but make sure to adjust the code accordingly)
+3. Connect the Heltec Wifi Lora 32 v2 board to your computer via USB.
+4. Open the Arduino IDE and select the correct board and port.
+5. Open the sketch at [`iot-connectivity-project-primary.ino`](iot-connectivity-project-primary/iot-connectivity-project-primary.ino).
+6. Adjust the WiFi credentials and MQTT broker settings in the code as described below.
+7. Ensure the WiFi access point is available and the MQTT broker is running (see the previous section for details on setting up the broker and web dashboard).
+8. Install the necessary libraries (if not already installed).
+9. Upload the code to the ESP32 board.
 
 > IMPORTANT: There's a [reported issue](https://github.com/arduino/arduino-ide/issues/2685) with the currently latest ``esp32`` board by Espressif Systems (version 3.2.0) that causes a compilation error.
 > To fix it, you need to make sure to downgrade the board to version 3.1.3 in the Arduino IDE.
