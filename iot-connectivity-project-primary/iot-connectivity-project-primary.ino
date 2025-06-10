@@ -1,28 +1,22 @@
-#include <WiFi.h>
-#include <PubSubClient.h>
 #include <DHT.h>
 #include <ArduinoJson.h>
 #include <Wire.h>
 #include "SSD1306.h"        
 #include <time.h>
+#include <LoRa.h>
 
-// WiFi credentials (a mobile hotspot works well for testing)
-const char* ssid = "Redmi Note 7";
-const char* password = "Zt14C3gh";
-
-// MQTT broker settings
-const char* mqtt_server = "172.20.10.2";
-const int mqtt_port = 1883;
-const char* mqtt_topic = "esp32/sensors/dht11";
+// LoRa pins (adjust according to your board)
+#define LORA_SCK  5
+#define LORA_MISO 19
+#define LORA_MOSI 27
+#define LORA_SS   18
+#define LORA_RST  14
+#define LORA_DIO0 26
 
 // DHT sensor settings
-#define DHTPIN 27
+#define DHTPIN 12
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
-
-// MQTT client
-WiFiClient espClient;
-PubSubClient client(espClient);
 
 // Display
 #define OLED_I2C_ADDRESS 0x3c
@@ -30,6 +24,9 @@ PubSubClient client(espClient);
 #define OLED_SCL 15
 #define OLED_RST 16
 SSD1306 display(OLED_I2C_ADDRESS, OLED_SDA, OLED_SCL);
+
+// Node ID for identification
+const String NODE_ID = "SENSOR_1";
 
 void setupDisplay() {
     // Reset and initialize the screen
@@ -64,36 +61,33 @@ void log(const String& msg) {
   display.display();
 }
 
-// Wi-Fi setup
-void setup_wifi() {
-  WiFi.begin(ssid, password);
-  log("Connecting to WiFi...");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  log("WiFi connected\nIP: " + WiFi.localIP().toString());
-}
+void setupLoRa() {
+  SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_SS);
+  LoRa.setPins(LORA_SS, LORA_RST, LORA_DIO0);
 
-// MQTT reconnect
-void reconnect() {
-  while (!client.connected()) {
-    log("Connecting to MQTT...");
-    if (client.connect("ESP32Client")) {
-      log("MQTT connected.");
-    } else {
-      log("MQTT failed, rc=" + String(client.state()));
-      delay(5000);
-    }
+  if (!LoRa.begin(868E6)) {
+    Serial.println("Starting LoRa failed!");
+    while (1);
   }
+
+  // Configure LoRa parameters
+  LoRa.setTxPower(20);
+  LoRa.setSpreadingFactor(7);
+  LoRa.setSignalBandwidth(125E3);
+  LoRa.setCodingRate4(5);
+  LoRa.enableCrc();
+  
+  log("LoRa initialized");
 }
 
 void setup() {
   Serial.begin(115200);
   setupDisplay();
   dht.begin();
-  setup_wifi();
-  client.setServer(mqtt_server, mqtt_port);
+  setupLoRa();
+  
+  log("Sensor Node Ready\nNode ID: " + NODE_ID);
+  delay(2000);
 }
 
 String getCurrentTime() {
@@ -106,37 +100,36 @@ String getCurrentTime() {
 }
 
 void loop() {
-  if (!client.connected()) {
-    reconnect();
-  }
-  client.loop();
-
   float humidity = dht.readHumidity();
   float temperature = dht.readTemperature();
 
   if (isnan(humidity) || isnan(temperature)) {
     log("Sensor error");
-    delay(2000);
     return;
   }
 
   // Create JSON payload
   StaticJsonDocument<200> doc;
+  doc["node_id"] = NODE_ID;
   doc["temperature"] = temperature;
   doc["humidity"] = humidity;
   char payload[256];
   serializeJson(doc, payload);
 
-  client.publish(mqtt_topic, payload);
+  // Send via LoRa
+  LoRa.beginPacket();
+  LoRa.print(payload);
+  LoRa.endPacket();
 
   String sampleTime = getCurrentTime();
 
   // Display on OLED
   String msg = "Temp: " + String(temperature, 1) + " ºC\n" +
                "Humidity: " + String(humidity, 1) + " %\n" +
-               "Time: " + sampleTime;
+               "Time: " + sampleTime + "\n" +
+               "Sent via LoRa";
   log(msg);
 
-  // Sample and publish every second
+  // Sample and send every second
   delay(1000);
 }
