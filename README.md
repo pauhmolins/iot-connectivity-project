@@ -140,3 +140,17 @@ There are a few advantages to using Docker in our case:
 - It allows us to run multiple instances of the broker, if needed, without conflicts
 - Configuration and dependencies are bundled, making deployments more reproducible
 - It simplifies updates and rollbacks, as different versions of Mosquitto can be tested and swapped easily using container tags
+
+### Activity 2
+
+**Q1: How does LoRa compare to Wi-Fi and Bluetooth in terms of range and power consumption?**
+
+Answer here.
+
+**Q2: What are the trade-offs of using lower data rates in LoRa transmission?**
+
+Answer here.
+
+**Q3: How does increasing transmission power affect battery life and interference?**
+
+Answer here.
