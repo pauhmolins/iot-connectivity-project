@@ -6,6 +6,8 @@
 
 This repository contains the code and reports for both activities of the "IoT Connectivity" course.
 
+> **NOTE:** The deliverable corresponding to the first activity alone can be found in a corresponding [release](https://github.com/pauhmolins/iot-connectivity-project/releases/tag/v1).
+
 Section [Overview](#overview) describes the project and its components.
 Section [Project Setup](#project-setup) describes how to set up the project by yourself.
 Section [Guiding questions](#guiding-questions) contains the answers to the questions that the assignment description proposes.
