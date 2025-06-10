@@ -26,17 +26,17 @@ The code in this repository is composed of two parts:
 
 The simple dashboard visualizes the data in real-time, showing the latest temperature and humidity readings from the weather station:
 
-![webdemo](/docs/webdemo.gif)
-
-The weather station shows some basic status information using a small OLED built-in display:
-
-![displaydemo](/docs/screen.jpg)
-
 Additionally, directory [`test/`](test/) contains handy Python scripts to test the MQTT broker,
 which can be used to run the dashboard without an actual weather station (that is, the two Heltec boards),
 as well as two Arduino sketches to test different LoRa configurations
 and measure the transmission time, data rate, RSSI and SNR of the packets sent by the boards,
 which we used to answer the assignment questions in activity 2.
+
+![webdemo](/docs/webdemo.gif)
+
+The weather station (both modules) shows some basic status information using a small OLED built-in display:
+
+![displaydemo](/docs/screens.jpg)
 
 ## Project Setup
 
