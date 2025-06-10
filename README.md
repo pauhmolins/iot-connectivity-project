@@ -143,14 +143,42 @@ There are a few advantages to using Docker in our case:
 
 ### Activity 2
 
+For the activity two, we decided to study deeply the first experiment: *"Adjusting the bandwidth and data rate to balance transmission speed and range."*.
+
+We set up an easily tweakable transmitter and receiver that send packets using different:
+- Spreading factors: we used values of 7, 10 and 12.
+- Bandwidths: we used 20.8kHz, 41.7kHz, 125kHz and 500kHz.
+
+For each combination of the above, we measured the following data from the receiver
+and transmitter (depending on the kind of data): transmission time (in seconds),
+transmission rate (in bits per second), RSSI (in dBm) and SNR (in dB).
+
+Below are the plots of the measured 'outputs' for all LoRa configuration combinations:
+
+TODO
+
+Finally, we answer the assignment questions:
+
 **Q1: How does LoRa compare to Wi-Fi and Bluetooth in terms of range and power consumption?**
 
-Answer here.
+LoRa is by far the protocol with the highest range, lasting kilometers. Wifi, on the other hand,
+has a range of a few meters (~20m in urban environments), and Bluetooth has the shortest range,
+lasting only a few meters.
+
+This usually relates to power consumption, making protocols that send to higher distances
+use more energy, but in this comparison there are other factors that have also a high impact
+on power consumption, such as data rates and frequency bands. LoRa is designed to use very
+low energy, but sends packets very slowly. The same applies to Bluetooth (which, compared to
+WiFi, sends very small packets).
 
 **Q2: What are the trade-offs of using lower data rates in LoRa transmission?**
 
-Answer here.
+Using lower data rates makes transmission times much longer, but makes the signal more reliable
+to noise, especially in long distances such as the ones LoRa signals usually need to face.
 
 **Q3: How does increasing transmission power affect battery life and interference?**
 
-Answer here.
+We did not try increasing transmission power since we went deeply into a previous analysis,
+but we suspect that increasing transmission power will make the battery to last less (i.e.
+reduce battery life) but reduce interferences, since our singal will stand out more among
+the noise.
