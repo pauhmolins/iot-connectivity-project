@@ -4,8 +4,7 @@
 
 *Authors (Activity 2): Marta Espejo, Jordi Nadeu, Pau de las Heras and Eric Roy*
 
-This repository contains the code and reports for the first activitiy of the
-"IoT Connectivity" course.
+This repository contains the code and reports for both activities of the "IoT Connectivity" course.
 
 Section [Overview](#overview) describes the project and its components.
 Section [Project Setup](#project-setup) describes how to set up the project by yourself.
@@ -16,13 +15,12 @@ Section [Guiding questions](#guiding-questions) contains the answers to the ques
 ## Overview
 
 The code in this repository is composed of two parts:
-- The firmware for the *Heltec Wifi Lora 32v2* board that collects temperature and
-  humidity readings from a DHT11 sensor and publishes them using the MQTT protocol to a broker.
-  It connects to a preset WiFi network and uses a pre-defined broker IP and port.
-  The corresponding Arduino IDE sketch can be found at [`iot-connectivity-project-primary.ino`](iot-connectivity-project-primary/iot-connectivity-project-primary.ino).
+- The firmware for the two *Heltec Wifi Lora 32v2* boards that jointly collect temperature and
+  humidity readings from a DHT11 sensor and publish them using the MQTT protocol to a broker.
+  They connect to a preset WiFi network and use a pre-defined broker IP and port.
+  The corresponding Arduino IDE sketches can be found at [`iot-connectivity-project-primary.ino`](iot-connectivity-project-primary/iot-connectivity-project-primary.ino) and [`iot-connectivity-project-secondary.ino`](iot-connectivity-project-secondary/iot-connectivity-project-secondary.ino).
 - The software to set up an MQTT broker and a web server (located in the [`flask`](flask/) directory) that ingests live data,
-  passed from the server to the page using socketio. Directory [`test/`](test/) contains handy Python scripts to test the MQTT broker,
-  which can be used to run the dashboard without an actual weather station.
+  passed from the server to the page using socketio.
 
 The simple dashboard visualizes the data in real-time, showing the latest temperature and humidity readings from the weather station:
 
@@ -31,6 +29,12 @@ The simple dashboard visualizes the data in real-time, showing the latest temper
 The weather station shows some basic status information using a small OLED built-in display:
 
 ![displaydemo](/docs/screen.jpg)
+
+Additionally, directory [`test/`](test/) contains handy Python scripts to test the MQTT broker,
+which can be used to run the dashboard without an actual weather station (that is, the two Heltec boards),
+as well as two Arduino sketches to test different LoRa configurations
+and measure the transmission time, data rate, RSSI and SNR of the packets sent by the boards,
+which we used to answer the assignment questions in activity 2.
 
 ## Project Setup
 
@@ -51,40 +55,43 @@ You just need a recent Docker version and:
 
 ### Weather station
 
-Our setup for the weather station (built around an ESP32-based board with sensors) consists of the following components:
+Our exact setup for the weather station (built around two ESP32-based board with sensors) consists of the following components:
 - Hardware
-  - A Heltec Wifi Lora 32 v2 board
+  - Two Heltec Wifi Lora 32 v2 boards
     - In Windows, you may have to install USB drivers for the board available [here](https://docs.keyestudio.com/projects/Arduino/en/latest/windowsCP2102.html).
   - A DHT11 temperature and humidity sensor
 - Software
   - Arduino IDE version 2.3.6
     - Board ``Heltec WiFi LoRa 32(V2)`` included in version ``3.1.3`` of the `esp32` package by Espressif Systems
-  - Additional libraries:
-    - [`PubSubClient`](http://pubsubclient.knolleary.net/) (version ``2.8``) by Nick O'Leary for MQTT communication
-    - [`DHT sensor library`](https://github.com/adafruit/DHT-sensor-library) (version ``1.4.6``) by Adafruit for interfacing with the DHT11 sensor
-    - [`ArduinoJson`](https://arduinojson.org/?utm_source=meta&utm_medium=library.properties) (version ``7.4.1``) by Benoit Blanchon for JSON serialization
+  - Additional libraries common to both modules:
     - [`ESP8266 and ESP32 OLED driver for SSD1306 displays`](https://github.com/ThingPulse/esp8266-oled-ssd1306) (version ``4.6.1``) by ThingPulse for controlling the OLED display
+    - [`ArduinoJson`](https://arduinojson.org/?utm_source=meta&utm_medium=library.properties) (version ``7.4.1``) by Benoit Blanchon for JSON serialization
+    - [`Lora`](https://github.com/sandeepmistry/arduino-LoRa) (version ``0.8.0``) by Sandeep Mistry for LoRa communication
+  - Additional libraries unique to one of the modules:
+    - [`DHT sensor library`](https://github.com/adafruit/DHT-sensor-library) (version ``1.4.6``) by Adafruit for interfacing with the DHT11 sensor in the primary module
+    - [`PubSubClient`](http://pubsubclient.knolleary.net/) (version ``2.8``) by Nick O'Leary for MQTT communication in the secondary module
 
 The setup steps are as follows:
 1. Install the Arduino IDE.
-2. Connect the DHT11 sensor to the Heltec Wifi Lora 32 v2 board:
+2. Connect the DHT11 sensor to the primary Heltec Wifi Lora 32 v2 board:
    - ``VCC`` pin to the board's ``3.3V`` pin
    - ``GND`` pin to the board's ``GND`` pin
    - ``DATA`` pin to ``GPIO27`` on the board (or any other GPIO, but make sure to adjust the code accordingly)
-3. Connect the Heltec Wifi Lora 32 v2 board to your computer via USB.
+3. Connect the primary Heltec Wifi Lora 32 v2 board to your computer via USB.
 4. Open the Arduino IDE and select the correct board and port.
 5. Open the sketch at [`iot-connectivity-project-primary.ino`](iot-connectivity-project-primary/iot-connectivity-project-primary.ino).
-6. Adjust the WiFi credentials and MQTT broker settings in the code as described below.
-7. Ensure the WiFi access point is available and the MQTT broker is running (see the previous section for details on setting up the broker and web dashboard).
-8. Install the necessary libraries (if not already installed).
-9. Upload the code to the ESP32 board.
+6. Repeat steps 3-5 for the secondary Heltec Wifi Lora 32 v2 board, but open the sketch at [`iot-connectivity-project-secondary.ino`](iot-connectivity-project-secondary/iot-connectivity-project-secondary.ino).
+7. Adjust the WiFi credentials and MQTT broker settings in the code as described below (secondary module only).
+8. Ensure the WiFi access point is available and the MQTT broker is running and accessible from that network (see the previous section for details on setting up the broker and web dashboard).
+9. Install the necessary libraries (if not already installed).
+10. Upload each sketch to the corresponding board.
 
 > IMPORTANT: There's a [reported issue](https://github.com/arduino/arduino-ide/issues/2685) with the currently latest ``esp32`` board by Espressif Systems (version 3.2.0) that causes a compilation error.
 > To fix it, you need to make sure to downgrade the board to version 3.1.3 in the Arduino IDE.
 
 #### WiFi and MQTT configuration
 
-The WiFi credentials and MQTT broker IP and port are defined in code, adjust appropriately in file [`iot-connectivity-project-primary.ino`](iot-connectivity-project-primary/iot-connectivity-project-primary.ino):
+The WiFi credentials and MQTT broker IP and port are defined in code, adjust appropriately in file [`iot-connectivity-project-secondary.ino`](iot-connectivity-project-secondary/iot-connectivity-project-secondary.ino):
 
 ```cpp
 ...
@@ -145,42 +152,55 @@ There are a few advantages to using Docker in our case:
 
 ### Activity 2
 
-For the activity two, we decided to study deeply the first experiment: *"Adjusting the bandwidth and data rate to balance transmission speed and range."*.
+For activity two, we decided to focus on the study of the first among the proposed experiments:
+*"Adjusting the bandwidth and data rate to balance transmission speed and range."*.
 
-We set up an easily tweakable transmitter and receiver that send packets using different:
-- Spreading factors: we used values of 7, 10 and 12.
-- Bandwidths: we used 20.8kHz, 41.7kHz, 125kHz and 500kHz.
+Using sketches [test/lora-sender-tester](test/lora-sender-tester) and [test/lora-receiver-tester](test/lora-receiver-tester),
+we manually tested different configurations for two key parameters that affect LoRa transmission speed and range (higher signal strength implies longer range):
+- **Spreading factors:** we used values of 7, 10 and 12.
+- **Bandwidths:** we used 20.8kHz, 41.7kHz, 125kHz and 500kHz.
 
-For each combination of the above, we measured the following data from the receiver
-and transmitter (depending on the kind of data): transmission time (in seconds),
-transmission rate (in bits per second), RSSI (in dBm) and SNR (in dB).
+For each combination of the above, we took measurements of the following metrics:
+transmission time (in seconds), transmission rate (in bits per second), RSSI (in dBm) and SNR (in dB).
 
-Below are the plots of the measured 'outputs' for all LoRa configuration combinations:
+All other parameters fixed to the following values (extracted from the tester sketches' code):
+```cpp
+struct LoRaConfig {
+  long frequency = 868E6;  // 915 MHz
+  ...
+  int codingRate = 5;      // 5 to 8 (4/5 to 4/8)
+  int txPower = 14;        // 2 to 20 dBm
+  int preambleLength = 8;  // Default 8
+  bool crcEnabled = true;
+  bool headerMode = false; // Explicit header mode
+};
+```
+
+Below are the plots of the measured 'outputs' for each of the explored LoRa configuration combinations:
 
 ![Transmission time plot](/docs/tx_time_vs_sf.png)
 
-We can see that higher frequencies enable faster transmission times, as well as small
+We can see that higher frequencies enable faster transmission times, as do small
 spreading factors, which make the message to spread less accross time, making it last
 less.
 
 ![Data rate plot](/docs/data_rate_vs_sf.png)
 
-This is the same as the previous plot, but with the data rate metric. This plot is
-maybe 'rendundant', since a long-lasting message already implies a slower data rate.
-However, we included it here too just for showcasing the results.
+This is the same as the previous plot, but with the data rate metric.
+The plot confirms that higher data rates are achieved with shorter transmission times, as expected.
 
 ![RSSI plot](/docs/rssi_vs_sf.png)
 
-This plot demonstrates that the received signal is higher with lower spreading factors.
-This maybe not that intuitive, since a message with high spreading factor should be
+This plot demonstrates that the received signal strength (RSSI) is higher with lower spreading factors.
+This may not be that intuitive, since a message with high spreading factor should be
 received with greater signal, but keep in mind that received signal depends deeply on
 the transmission power, as well as the environment itself.
 
 Here it can be that the antenna has a better reception with certain frequencies, as well
-as the on the air time can affect the RSSI calculation (longer transmission times
+as that on-the-air time can affect the RSSI calculation (longer transmission times
 makes it more probable for an interference to happen).
 
-The same applies with this last plot.
+Similar conclusions can be drawn from the last plot, which shows the relationship between spreading factor and SNR.
 
 ![SNR plot](/docs/snr_vs_sf.png)
 
@@ -190,7 +210,7 @@ Finally, we answer the assignment questions:
 
 LoRa is by far the protocol with the highest range, lasting kilometers. Wifi, on the other hand,
 has a range of a few meters (~20m in urban environments), and Bluetooth has the shortest range,
-lasting only a few meters.
+reaching only a few meters away.
 
 This usually relates to power consumption, making protocols that send to higher distances
 use more energy, but in this comparison there are other factors that have also a high impact
@@ -200,12 +220,22 @@ WiFi, sends very small packets).
 
 **Q2: What are the trade-offs of using lower data rates in LoRa transmission?**
 
-Using lower data rates makes transmission times much longer, but makes the signal more reliable
+Using lower data rates makes transmission times much longer, but makes the signal more reliable  
 to noise, especially in long distances such as the ones LoRa signals usually need to face.
+
+Additionally, lower data rates improve the link budget, allowing devices to maintain connectivity  
+in harder environments (e.g. urban areas or indoor setups). However, the increased airtime per  
+packet can lead to higher chances of collisions in networks with many nodes and also increases  
+energy consumption per message despite the lower rate.
 
 **Q3: How does increasing transmission power affect battery life and interference?**
 
 We did not try increasing transmission power since we went deeply into a previous analysis,
 but we suspect that increasing transmission power will make the battery to last less (i.e.
-reduce battery life) but reduce interferences, since our singal will stand out more among
+reduce battery life) but reduce interferences, since our signal will stand out more among
 the noise.
+
+It's also worth noting that higher transmission power can increase the range and reliability  
+of communication, but may lead to more interference with nearby devices and violate regional  
+regulatory limits if not properly configured. It can also make overall network performance worse
+in dense deployments due to overlapping transmissions.
