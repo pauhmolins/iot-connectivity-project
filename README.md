@@ -28,7 +28,7 @@ The simple dashboard visualizes the data in real-time, showing the latest temper
 
 The weather station shows some basic status information using a small OLED built-in display:
 
-![webdemo](/docs/screen.jpg)
+![displaydemo](/docs/screen.jpg)
 
 ## Project Setup
 
@@ -155,7 +155,32 @@ transmission rate (in bits per second), RSSI (in dBm) and SNR (in dB).
 
 Below are the plots of the measured 'outputs' for all LoRa configuration combinations:
 
-TODO
+![Transmission time plot](/docs/tx_time_vs_sf.png)
+
+We can see that higher frequencies enable faster transmission times, as well as small
+spreading factors, which make the message to spread less accross time, making it last
+less.
+
+![Data rate plot](/docs/data_rate_vs_sf.png)
+
+This is the same as the previous plot, but with the data rate metric. This plot is
+maybe 'rendundant', since a long-lasting message already implies a slower data rate.
+However, we included it here too just for showcasing the results.
+
+![RSSI plot](/docs/rssi_vs_sf.png)
+
+This plot demonstrates that the received signal is higher with lower spreading factors.
+This maybe not that intuitive, since a message with high spreading factor should be
+received with greater signal, but keep in mind that received signal depends deeply on
+the transmission power, as well as the environment itself.
+
+Here it can be that the antenna has a better reception with certain frequencies, as well
+as the on the air time can affect the RSSI calculation (longer transmission times
+makes it more probable for an interference to happen).
+
+The same applies with this last plot.
+
+![SNR plot](/docs/snr_vs_sf.png)
 
 Finally, we answer the assignment questions:
 
