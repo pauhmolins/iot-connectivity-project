@@ -1,6 +1,8 @@
 # IoT Connectivity: Project
 
-*Authors: Pau de las Heras and Eric Roy*
+*Authors (Activity 1): Pau de las Heras and Eric Roy*
+
+*Authors (Activity 2): Marta Espejo, Jordi Nadeu, Pau de las Heras and Eric Roy*
 
 This repository contains the code and reports for the first activitiy of the
 "IoT Connectivity" course.
